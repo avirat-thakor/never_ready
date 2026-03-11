@@ -7,8 +7,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.model_selection import TimeSeriesSplit
 
-
-
 def add_civic_lags(df, max_lag):
     """
     Helper function for grid search over # of lags: Add civic_sales_lag1, ..., civic_sales_lag{max_lag} to df.
