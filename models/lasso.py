@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 from sklearn.linear_model import LassoCV
 from sklearn.preprocessing import StandardScaler
@@ -65,7 +67,7 @@ for max_lag in candidate_lags:
                 alphas=alphas,
                 cv=tscv,
                 random_state=0,
-                max_iter=10000
+                max_iter=100000
             )),
         ]
     )
@@ -101,3 +103,90 @@ for max_lag in candidate_lags:
    
 print("Train std:", y_train.std())
 print("Test std :", y_test.std())
+
+
+
+
+# Refit for optimal lag length (1) to create visualization
+chosen_lag = 1
+df_lagged_1 = add_civic_lags(df, chosen_lag)
+df_lagged_1["date"] = pd.to_datetime(df_lagged_1["date"])
+
+lag_features_1 = [f"civic_lag{lag}" for lag in range(1, chosen_lag + 1)]
+feature_cols_1 = base_features + lag_features_1
+
+X_1 = df_lagged_1[feature_cols_1].values
+y_1 = df_lagged_1["civic_sales"].values
+
+train_size_1 = len(df_lagged_1) - test_size
+X_train_1, X_test_1 = X_1[:train_size_1], X_1[train_size_1:]
+y_train_1, y_test_1 = y_1[:train_size_1], y_1[train_size_1:]
+
+lasso_pipeline.fit(X_train_1, y_train_1)
+y_pred_train_1 = lasso_pipeline.predict(X_train_1)
+y_pred_test_1 = lasso_pipeline.predict(X_test_1)
+
+
+plt.figure(figsize=(12, 6))
+
+plt.plot(df_lagged_1["date"].iloc[:train_size_1], y_train_1, label="Train Actual", color="black", alpha=0.5)
+plt.plot(df_lagged_1["date"].iloc[train_size_1:], y_test_1, label="Test Actual", color="blue", linewidth=2)
+
+plt.plot(df_lagged_1["date"].iloc[:train_size_1], y_pred_train_1, label="Train Pred", color="red", linestyle="--", alpha=0.7)
+plt.plot(df_lagged_1["date"].iloc[train_size_1:], y_pred_test_1, label="Test Pred", color="orange", linewidth=2)
+
+plt.axvline(x=df_lagged_1["date"].iloc[train_size_1], color='green', linestyle=':', label='Train/Test Split')
+plt.title(f"Civic Sales Forecast (Lasso with {chosen_lag} Lag)")
+plt.legend()
+
+# Space out X-axis markers
+ax = plt.gca()
+ax.xaxis.set_major_locator(mdates.YearLocator(2))
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig("visualization/lasso/lasso_lag1_plot.png", dpi=300, bbox_inches="tight")
+plt.close()
+
+
+
+# Refit the optimal lag 1 model using only the last 40 points of training data (omitting 200 in earlier periods)
+
+X_1_short = df_lagged_1[feature_cols_1].values
+y_1_short = df_lagged_1["civic_sales"].values
+
+train_size_1_short = len(df_lagged_1) - test_size
+X_train_1_short, X_test_1_short = X_1[200:train_size_1], X_1[train_size_1:]
+y_train_1_short, y_test_1_short = y_1[200:train_size_1], y_1[train_size_1:]
+
+lasso_pipeline.fit(X_train_1_short, y_train_1_short)
+y_pred_train_1_short = lasso_pipeline.predict(X_train_1_short)
+y_pred_test_1_short = lasso_pipeline.predict(X_test_1_short)
+
+
+plt.figure(figsize=(12, 6))
+
+plt.plot(df_lagged_1["date"].iloc[200:train_size_1], y_train_1_short, label="Train Actual", color="black", alpha=0.5)
+plt.plot(df_lagged_1["date"].iloc[train_size_1:], y_test_1_short, label="Test Actual", color="blue", linewidth=2)
+
+plt.plot(df_lagged_1["date"].iloc[200:train_size_1], y_pred_train_1_short, label="Train Pred", color="red", linestyle="--", alpha=0.7)
+plt.plot(df_lagged_1["date"].iloc[train_size_1:], y_pred_test_1_short, label="Test Pred", color="orange", linewidth=2)
+
+plt.axvline(x=df_lagged_1["date"].iloc[train_size_1], color='green', linestyle=':', label='Train/Test Split')
+plt.title(f"Civic Sales Forecast (Lasso with {chosen_lag} Lag)")
+plt.legend()
+
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig("visualization/lasso/lasso_lag1_plot_omitting_earlier_training_data.png", dpi=300, bbox_inches="tight")
+plt.close()
+
+mse_train_1_short = mean_squared_error(y_train_1_short, y_pred_train_1_short)
+mse_test_1_short = mean_squared_error(y_test_1_short, y_pred_test_1_short)
+r2_test_1_short = r2_score(y_test_1_short, y_pred_test_1_short)
+
+print(f"\nLASSO with max_lag = {1} with only recent training data")
+print(f"Optimal alpha (lambda): {lasso_cv.alpha_:.6f}")
+print(f"n_features: {len(feature_cols_1)} | n_kept: {int(non_zero_mask.sum())}")
+print(feature_cols_1)
+print(f"Train MSE: {mse_train_1_short:.2f} | Test MSE: {mse_test_1_short:.2f} | Test R^2: {r2_test_1_short:.3f}")
