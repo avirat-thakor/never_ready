@@ -150,7 +150,9 @@ plt.close()
 
 
 
-# Refit the optimal lag 1 model using only the last 40 points of training data (omitting 200 in earlier periods)
+# Refit the optimal lag 1 model using only the last 40 points of training data 
+# (omitting 200 in earlier periods) as an effort to invetigate the cause of 
+# the inflated train mse compared to test
 
 X_1_short = df_lagged_1[feature_cols_1].values
 y_1_short = df_lagged_1["civic_sales"].values
