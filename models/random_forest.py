@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
 
 from sklearn.ensemble import RandomForestRegressor
@@ -111,6 +112,8 @@ if __name__ == "__main__":
     best_test_mse = None
     best_num_ylags = None
     best_model = None
+    best_y_test = None
+    best_y_hat_test = None
     for lags in range(0, 5):
         # Adding lags to dataset
         X_lagged = add_lags(lags, X, y)
@@ -140,8 +143,11 @@ if __name__ == "__main__":
             best_train_mse = train_mse
             best_test_mse = test_mse
             best_num_ylags = lags
+            best_y_test = y_test
+            best_y_hat_test = y_hat_test
     
-    # Getting RMSEs
+    # Getting RMSEs and absolute value residual
+    best_abs_residual = np.sqrt((y_test - y_hat_test)**2)
     best_train_rmse = np.sqrt(best_train_mse)
     best_test_rmse = np.sqrt(best_test_mse)
     
@@ -156,3 +162,26 @@ if __name__ == "__main__":
     print(f"{best_test_rmse=}")
     print(f"{best_num_ylags=}")
     
+    # Plotting actual vs. predicted
+    date_test = df["date"].iloc[-12:]
+    plt.figure(figsize=(12, 6))
+    plt.plot(date_test, best_y_test, label="Actual Civic Sales")
+    plt.plot(date_test, best_y_hat_test, label="Predicted Civic Sales")
+    plt.xlabel("Date")
+    plt.ylabel("Civic Sales")
+    plt.title("Actual vs Predicted Civic Sales for last 12 months")
+    plt.legend()
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+    
+    # Plotting absolute value residual
+    date_test = df["date"].iloc[-12:]
+    plt.figure(figsize=(12, 6))
+    plt.plot(date_test, best_abs_residual)
+    plt.xlabel("Date")
+    plt.title("Abs. Difference btwn Actual and Predicted for last 12 months")
+    plt.legend()
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
