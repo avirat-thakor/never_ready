@@ -76,7 +76,9 @@ for max_lag in candidate_lags:
     lasso_cv = lasso_pipeline.named_steps["lasso"]
 
     coefs = lasso_cv.coef_
-    non_zero_mask = coefs != 0
+    non_zero_mask = ~np.isclose(coefs, 0)
+    
+  
 
     y_pred_train = lasso_pipeline.predict(X_train)
     y_pred_test = lasso_pipeline.predict(X_test)
@@ -91,9 +93,16 @@ for max_lag in candidate_lags:
     print(f"\nLASSO with max_lag = {max_lag} ")
     print(f"Optimal alpha (lambda): {lasso_cv.alpha_:.6f}")
     print(f"n_features: {len(feature_cols)} | n_kept: {int(non_zero_mask.sum())}")
-    print(feature_cols)
     print(f"Train MSE: {mse_train:.2f} | Test MSE: {mse_test:.2f} | Test R^2: {r2_test:.3f}")
     print(f"Train RMSE: {rmse_train:.2f} | Test RMSE: {rmse_test:.2f} | Test R^2: {r2_test:.3f}")
+    print("Kept coefficients:")
+    for feature, coef, keep in zip(feature_cols, coefs, non_zero_mask):
+        if keep:
+            print(f"{feature}: {coef:.6f}")
+    print("Dropped coefficients:")
+    for feature, coef, keep in zip(feature_cols, coefs, non_zero_mask == False):
+        if keep:
+            print(f"{feature}: {coef:.6f}")
 
     results.append({
         "max_lag": max_lag,
