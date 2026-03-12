@@ -3,6 +3,8 @@ import statsmodels.formula.api as smf
 import matplotlib.pyplot as plt
 import os
 
+from model_results import log_model_results
+
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error as mse
@@ -62,7 +64,15 @@ our assumtion that they were substitutes for civic sales.
 the regression includes a note highlighting strong multicollinearity. 
 - Will need further developing.
 """
-
+### Logging model results
+model_name = "linear_regression"
+metrics = {
+    "train_mse": train_mse,
+    "test_mse": test_mse,
+    "root_train_mse": root_train,
+    "root_test_mse": root_test,
+}
+log_model_results(model_name, metrics)
 
 ### Plotting the actual vs predicted values for the test set, 
 ### using the 12 omitted data points as the test set.
@@ -85,7 +95,7 @@ This part will now generate a plot of the actual vs predicted values across the 
 
 plt.figure(figsize=(10, 6))
 plt.plot(df['date'], y, label='Actual', color='blue')
-plt.plot(df['date'], model.predict(X), label='Predicted', color='red')
+plt.plot(df['date'], model.predict(X), label='Predicted', color='red', linestyle='--')
 plt.xlabel('Date')
 plt.ylabel('Civic Sales')
 plt.title('Linear Regression: Actual vs Predicted (Full Dataset)')
