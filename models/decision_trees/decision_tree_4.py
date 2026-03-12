@@ -23,18 +23,15 @@ def get_season(month):
 
 df["season"] = df["month"].apply(get_season)
 
-df["t"] = range(len(df))
-
-df["civic_diff1"] = df["civic_sales"].diff()
+df["civic_diff1"] = df["civic_sales"].shift(1).diff()
 df["civic_lag1"] = df["civic_sales"].shift(1)
-df["civic_lag2"] = df["civic_sales"].shift(2)
-df["civic_ma3"] = df["civic_sales"].rolling(3).mean()
+df["civic_ma12"] = df["civic_sales"].shift(1).rolling(12).mean()
 
 df = df.dropna().reset_index(drop=True)
 df = pd.get_dummies(df, columns=["season"], drop_first=True)
 
 y = df["civic_sales"]
-X = df.drop(columns=["civic_sales", "date"])
+X = df.drop(columns=["civic_sales", "date", "month"])
 
 # train everything except last year of data, test on last year
 X_train = X.iloc[:-12]
@@ -48,7 +45,7 @@ date_test = df["date"].iloc[-12:]
 
 # fit model
 model = DecisionTreeRegressor(
-    max_depth=4,
+    max_depth=5,
     random_state=42
 )
 
