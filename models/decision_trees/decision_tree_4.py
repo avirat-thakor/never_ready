@@ -8,7 +8,7 @@ df = pd.read_csv("data/combined_table.csv")
 
 df["date"] = pd.to_datetime(df["date"])
 
-# seasonality setup
+# seasonality
 df["month"] = df["date"].dt.month
 
 def get_season(month):
@@ -29,16 +29,11 @@ df["civic_diff1"] = df["civic_sales"].diff()
 df["civic_lag1"] = df["civic_sales"].shift(1)
 df["civic_lag2"] = df["civic_sales"].shift(2)
 df["civic_ma3"] = df["civic_sales"].rolling(3).mean()
-df = df.dropna().reset_index(drop=True)
 
-# create season dummies
+df = df.dropna().reset_index(drop=True)
 df = pd.get_dummies(df, columns=["season"], drop_first=True)
-df = df.dropna().reset_index(drop=True)
 
-# target
 y = df["civic_sales"]
-
-# predictors
 X = df.drop(columns=["civic_sales", "date"])
 
 # train everything except last year of data, test on last year
@@ -48,6 +43,7 @@ X_test = X.iloc[-12:]
 y_train = y.iloc[:-12]
 y_test = y.iloc[-12:]
 
+date_train = df["date"].iloc[:-12]
 date_test = df["date"].iloc[-12:]
 
 # fit model
@@ -69,13 +65,63 @@ print("Test MSE:", test_mse)
 print("Train RMSE:", np.sqrt(train_mse))
 print("Test RMSE:", np.sqrt(test_mse))
 
-#plot
+# plot 
 plt.figure(figsize=(12, 6))
-plt.plot(date_test, y_test, label="Actual Civic Sales")
-plt.plot(date_test, y_test_pred, label="Predicted Civic Sales")
+
+# train actual
+plt.plot(date_train, y_train,
+         label="Train Actual",
+         color="blue")
+
+# test actual
+plt.plot(date_test, y_test,
+         label="Test Actual",
+         color="black")
+
+# train prediction
+plt.plot(date_train, y_train_pred,
+         label="Train Prediction",
+         linestyle="--",
+         color="orange")
+
+# test prediction
+plt.plot(date_test, y_test_pred,
+         label="Test Prediction",
+         linestyle="--",
+         color="red")
+
+# vertical line for split
+plt.axvline(x=date_test.iloc[0],
+            color="purple",
+            linestyle=":",
+            label="Train/Test Split")
+
 plt.xlabel("Date")
 plt.ylabel("Civic Sales")
-plt.title("Actual vs Predicted Civic Sales of Last 12 Months")
+plt.title("Decision Tree Predictions with Train/Test Split")
+plt.legend()
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+# Test period plot
+plt.figure(figsize=(10, 5))
+
+plt.plot(date_test, y_test,
+         label="Actual",
+         color="black",
+         linewidth=2)
+
+plt.plot(date_test, y_test_pred,
+         label="Prediction",
+         linestyle="--",
+         color="red",
+         linewidth=2)
+
+plt.xlabel("Date")
+plt.ylabel("Civic Sales")
+plt.title("Decision Tree — Last 12 Months Only")
+
 plt.legend()
 plt.xticks(rotation=45)
 plt.tight_layout()
