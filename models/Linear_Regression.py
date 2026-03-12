@@ -1,11 +1,18 @@
 import pandas as pd
 import statsmodels.formula.api as smf
+import matplotlib.pyplot as plt
+import os
 
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error as mse
 
+
 df = pd.read_csv('data/combined_table.csv')
+
+output_dir = "visualization/linear_regression"
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
 ### Base Model
 linear_model = smf.ols('civic_sales ~ corolla_sales + sentra_sales + cpi + fedfunds + gas + unemploy + csi + tdsp', data=df)
@@ -32,12 +39,17 @@ y_test_pred = model.predict(X_test)
 train_mse = mse(y_train, y_train_pred)
 test_mse = mse(y_test, y_test_pred)
 
+root_train = train_mse ** 0.5
+root_test = test_mse ** 0.5
+
+R_Squared = lin_res.rsquared
+
 print(f'Train MSE: {train_mse}')
 print(f'Test MSE: {test_mse}')
+print(f'Root Train MSE: {root_train}')
+print(f'Root Test MSE: {root_test}') 
+print(f'R-squared: {R_Squared}')
 
-
-
-### May be worth adding RESET test on individual or combinations of variables
 
 ###
 """
@@ -50,3 +62,36 @@ our assumtion that they were substitutes for civic sales.
 the regression includes a note highlighting strong multicollinearity. 
 - Will need further developing.
 """
+
+
+### Plotting the actual vs predicted values for the test set, 
+### using the 12 omitted data points as the test set.
+
+plt.figure(figsize=(10, 6))
+plt.plot(df['date'].iloc[-12:], y_test, label='Actual', color='blue')
+plt.plot(df['date'].iloc[-12:], y_test_pred, label='Predicted', color='red')
+plt.xlabel('Date')
+plt.ylabel('Civic Sales')
+plt.title('Linear Regression: Actual vs Predicted')
+plt.legend()
+plt.tight_layout()
+
+plt.savefig(f"{output_dir}/linear_regression_plot.png", dpi=300, bbox_inches="tight")
+plt.close()
+
+"""
+This part will now generate a plot of the actual vs predicted values across the entire dataset
+"""
+
+plt.figure(figsize=(10, 6))
+plt.plot(df['date'], y, label='Actual', color='blue')
+plt.plot(df['date'], model.predict(X), label='Predicted', color='red')
+plt.xlabel('Date')
+plt.ylabel('Civic Sales')
+plt.title('Linear Regression: Actual vs Predicted (Full Dataset)')
+plt.legend()
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig(f"{output_dir}/linear_regression_full_plot.png", dpi=300, bbox_inches="tight")
+plt.close()
+
