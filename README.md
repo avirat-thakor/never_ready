@@ -72,7 +72,10 @@ Overall, LASSO with 1 lag of Civic sales is a strong and interpretable forecasti
 ### Decision Tree
 
 ## III. Recomendations 
-*best model and approach*
+
+Among the models we tested, SARIMAX with a shock dummy produced the best pure forecasting performance, achieving the lowest test MSE and RMSE in our . This suggests that explicitly modeling time-series dynamics and accounting for abnormal periods such as COVID can materially improve predictive accuracy. At the same time, we do not view this result as meaning that SARIMAX is the only path forward. A significantly contributing reason for its strong performance is that it benefited substantially from the inclusion of a shock dummy, and that same idea could also be incorporated into other models, including LASSO, linear regression, and tree-based methods. In that sense, part of SARIMAX’s advantage likely reflects the value of better feature design, not just the model class itself.
+
+For the overall project, we lean more heavily toward LASSO with 1 lag of Civic sales as the most useful benchmark moving forward. LASSO dramatically improved on naive linear regression, remained relatively interpretable, and captured persistence in monthly sales while controlling model complexity through regularization. It gives us a strong balance of prediction, simplicity, and feature selection, which makes it especially attractive for future refinement. There is also clear room to improve it further: adding shock dummies, seasonality controls, and possibly lagged versions of selected explanatory variables could help LASSO close part of the remaining gap with SARIMAX. For that reason, our practical recommendation is to treat SARIMAX + shock dummy as the strongest current forecasting model, while viewing lagged LASSO as the most promising and expandable interpretable model for future development.
 
 ## IV. Rerun Instructions
 ### Requirements 
