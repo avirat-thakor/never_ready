@@ -1,7 +1,8 @@
 import pandas as pd
 
-
+# Helper functions
 def load_car_data(path, target_name):
+    """Load a car sales CSV and return a monthly DataFrame with ['date', target_name] as integer sales."""
     df = pd.read_csv(path)
     df["date"] = pd.to_datetime(df["Year, Month"], format="%Y, %b")
     value_col = "Sales" if "Sales" in df.columns else "Value"
@@ -10,11 +11,13 @@ def load_car_data(path, target_name):
     return df
 
 def load_macro_monthly(path, series_name):
+    """Load a monthly macro CSV and return a DataFrame with ['date', series_name]."""
     df = pd.read_csv(path)
     df["date"] = pd.to_datetime(df["observation_date"])
     return df[["date", series_name]]
 
 def load_tdsp_quarterly_to_monthly(path):
+    """Load quarterly TDSP data, upsample it to monthly, and return ['date', 'TDSP'] with forward-filled values."""
     df = pd.read_csv(path)
     df["date"] = pd.to_datetime(df["observation_date"])
     df = df[["date", "TDSP"]].set_index("date")
