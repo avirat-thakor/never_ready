@@ -196,6 +196,7 @@ plt.xlabel("Date")
 plt.ylabel("Civic Sales")
 plt.legend()
 plt.tight_layout()
+plt.savefig("visualization/sarimax/Civic_Sales_SARIMAX_Shocks_Forecast.png")
 plt.show()
 
 #SARIMAX Graph
@@ -210,4 +211,5 @@ plt.xlabel("Date")
 plt.ylabel("Civic Sales")
 plt.legend()
 plt.tight_layout()
+plt.savefig("visualization/sarimax/Civic_Sales_SARIMAX_Forecast.png")
 plt.show()
