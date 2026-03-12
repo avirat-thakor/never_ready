@@ -39,6 +39,31 @@ TDSP - Percent Household Debt of Disposable Income
 ### Linear Regression
 
 ### LASSO
+We estimated a LASSO regression model to predict monthly Honda Civic sales using competitor sales, macroeconomic indicators, and a lagged value of Civic sales. Because LASSO is sensitive to scale, all predictors were standardized before estimation, and the penalty parameter was selected using time-series cross-validation. Among the lag structures we tested via grid search (0 to 5), the best specification used 1 lag of Civic sales, which helped the model capture persistence in monthly demand while keeping the model relatively simple.
+
+For our preferred lag-1 LASSO specification, the model achieved:  
+- Optimal lambda: 24.42    
+- Features kept: 7 of 8  
+- Train MSE: 14,481,457.06  
+- Test MSE: 3,976,307.62  
+- Train RMSE: 3,805.45  
+- Test RMSE: 1,994.07  
+- est R^2: 0.583  
+  
+
+<img src="visualization/lasso/lasso_lag1_plot.png" width="600">
+
+The above plot above is used to evaluate the predictive strength of the LASSO model. It shows that the model tracks the recent test-period movement in Civic sales reasonably well and performs much better than our naive linear regression benchmark. This is also reflected in the metrics: LASSO reduced test MSE substantially relative to linear regression, showing that adding regularization and a lagged Civic sales term improved out-of-sample prediction by a large margin. For this reason, LASSO became our strongest interpretable machine-learning model.
+
+The first plot also reveals an unusual pattern: the model’s training MSE is larger than its test MSE. While that initially seems counterintuitive, the graph suggests a clear explanation. The training period covers a much longer and more volatile historical sample, including larger spikes and sharper swings in Civic sales, while the final 12-month test period is comparatively smoother. In that setting, a regularized model like LASSO may fit the noisier historical period less closely while still forecasting the calmer recent period relatively well.
+
+<img src="visualization/lasso/lasso_lag1_plot_omitting_earlier_training_data.png" width="600">
+
+The second plot was created to investigate this unusual MSE pattern. To do this, we re-estimated the same LASSO model with 1 lag using only the most recent 40 training observations, dropping the first 200 periods from the original sample. This robustness check was meant to test whether the earlier historical data were inflating the full-sample training error.
+
+Once we restricted the model to recent training data, the more typical pattern of train MSE (5.29M) < test MSE (6.58M) reappeared. This supports the interpretation that the original full-sample result was driven by the much greater volatility of the older data, rather than by a coding or implementation problem. At the same time, the model’s overall predictive performance became worse, so this reduced-sample version is best viewed as a diagnostic exercise rather than a superior forecasting model.
+
+Overall, LASSO with 1 lag of Civic sales is a strong and interpretable forecasting model. It improved substantially over naive linear regression, captured persistence in monthly sales, and delivered strong out-of-sample performance while remaining relatively simple through regularization. Although SARIMAX with a shock dummy (See next section) achieved the best final forecasting accuracy in the end, LASSO remained our preferred interpretable machine-learning benchmark.
 
 ### Time Series (ARIMA)
 
