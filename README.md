@@ -121,7 +121,7 @@ The data is uploaded within this repo in the raw_data folder (data/raw_data). Th
 
 #### Lasso  
 Running `models/lasso.py` will re-estimate the LASSO forecasting model using the cleaned `data/combined_table.csv` dataset. The script standardizes the predictors, performs a grid search over lag specifications for Civic sales, and uses LassoCV with TimeSeriesSplit to choose the optimal regularization parameter for each lag setting. It then reports the key metrics and features for each candidate model. After identifying the preferred lag specification, the script also generates `visualization/lasso/lasso_lag1_plot.png` to present the overall fit visually.  
-Further more, the script also performs an additional robustness check that re-fits the lag-1 LASSO after dropping the first 200 observations and keeping only the most recent training window. This produces a second set of train/test MSE results and a second forecast plot `visualization/lasso/lasso_lag1_plot_omitting_earlier_training_data.png`. 
+Furthermore, the script also performs an additional robustness check that re-fits the lag-1 LASSO after dropping the first 200 observations and keeping only the most recent training window. This produces a second set of train/test MSE results and a second forecast plot `visualization/lasso/lasso_lag1_plot_omitting_earlier_training_data.png`. 
 
 #### Random Forest
 
