@@ -107,7 +107,7 @@ This model presented a test MSE of approx. 30,119,255 and a train MSE of aprrox.
 
 Seeking to imrpove on this model, by accounting for unusually large disruptions in the automobile market (e.g. the COVID-19 pandemic and global supply chain issues) we introduced a shock dummy variable that manually identifies periods of abnormal fluctuations in sales. This allows the model to separate temporary shocks from the underlying time-series dynamics rather than forcing the autoregressive structure to absorb those extreme movements. This model presented a test MSE of approx. 29,392,150 and a train MSE of aprrox. 2,936,170; which outperforms all of our other models in test MSE (see SARIMAX + Shock Dummy prediction plot below).
 
-<img src="visualization/sarimax/visualization/sarimax/Civic_Sales_SARIMAX__Shocks_Forecast.png" width="600">
+<img src="visualization/sarimax/visualization/sarimax/Civic_Sales_SARIMAX_Shocks_Forecast.png" width="600">
 
 The SARIMAX model with the shock dummy produced the strongest forecasting performance among the models considered, achieving the lowest test MSE of approx. 2,936,170 in our comparison. Notably, the model’s training MSE is relatively large due to the volatility present in the earlier portion of the dataset. This also may be either due to the nature of the model (coefficient estimation through Maximum Likelihood rather than minimizing the errors) or inherent limitations in SARIMA type models to handle heteroskedasticity caused by the shocks. That said, it follows that explicitly modeling seasonality and major disruptions in vehicle markets significantly improved forecast accuracy for monthly car sales.
 
