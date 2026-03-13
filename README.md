@@ -87,12 +87,74 @@ Once we restricted the model to recent training data, the more typical pattern o
 
 Overall, LASSO with 1 lag of Civic sales is a strong and interpretable forecasting model. It improved substantially over naive linear regression, captured persistence in monthly sales, and delivered strong out-of-sample performance while remaining relatively simple through regularization. Although SARIMAX with a shock dummy (See next section) achieved the best final forecasting accuracy in the end, LASSO remained our preferred interpretable machine-learning benchmark.
 
-### Time Series (ARIMA)
+### Time Series (ARIMAX + Shock Dummy)
+Because monthly vehicle sales exhibit strong persistence and seasonal patterns, we estimated a set of time-series models using the SARIMA and SARIMAX frameworks. Unlike regression-based models, these approaches explicitly model the temporal dependence of the sales series and allow seasonal patterns to be captured directly.
+
+Before estimating the models, we tested the Honda Civic sales series for stationarity using the Augmented Dickey–Fuller (ADF) test. The original series failed to reject the null hypothesis of a unit root, indicating that the series was non-stationary. After applying a first difference, the ADF test strongly rejected the null, confirming that the differenced sales data was stationary and could be used for time-series modeling.
+
+To determine the correct lag structure, we examined the autocorrelation function (ACF) and partial autocorrelation function (PACF) plots of the differenced series. The ACF displayed a significant spike at lag 1 as well as a seasonal spike at lag 12, while the PACF did not show a clear cutoff pattern associated with an autoregressive process. This pattern is consistent with a moving-average process with a seasonal component (see ACF and PACF plots). 
+
+<img src="visualization/sarimax/acf_diff.png" width="600">
+
+<img src="visualization/sarimax/pacf_diff.png" width="600">
+
+Based on these diagnostics, we estimated a SARIMA(0,1,1)(0,1,1)_12 model, where the seasonal component captures yearly patterns in monthly vehicle sales.
+
+While the SARIMA model captures the internal dynamics of Civic sales, it does not incorporate economic variables that may influence vehicle sales (demand). To address this, we extended the model to a SARIMAX specification by including selected macroeconomic indicators as exogenous variables, including gas prices, the unemployment rate, and the federal funds rate.
+This model presented a test MSE of approx. 30,119,255 and a train MSE of aprrox. 3,185,347; which outperforms a few of our other ML models (see SARIMAX prediction plot below).
+
+<img src="visualization/sarimax/Civic_Sales_SARIMAX_Forecast.png" width="600">
+
+Seeking to imrpove on this model, by accounting for unusually large disruptions in the automobile market (e.g. the COVID-19 pandemic and global supply chain issues) we introduced a shock dummy variable that manually identifies periods of abnormal fluctuations in sales. This allows the model to separate temporary shocks from the underlying time-series dynamics rather than forcing the autoregressive structure to absorb those extreme movements. This model presented a test MSE of approx. 29,392,150 and a train MSE of aprrox. 2,936,170; which outperforms all of our other models in test MSE (see SARIMAX + Shock Dummy prediction plot below).
+
+<img src="visualization/sarimax/visualization/sarimax/Civic_Sales_SARIMAX__Shocks_Forecast.png" width="600">
+
+The SARIMAX model with the shock dummy produced the strongest forecasting performance among the models considered, achieving the lowest test MSE of approx. 2,936,170 in our comparison. Notably, the model’s training MSE is relatively large due to the volatility present in the earlier portion of the dataset. This also may be either due to the nature of the model (coefficient estimation through Maximum Likelihood rather than minimizing the errors) or inherent limitations in SARIMA type models to handle heteroskedasticity caused by the shocks. That said, it follows that explicitly modeling seasonality and major disruptions in vehicle markets significantly improved forecast accuracy for monthly car sales.
+
+Notable models that were also explored include, SARIMAX with all features available and SARIMAX + LASSO for feature selection. Neither model outperformed the SARIMAX + Shock Dummy variable in either train or test MSE.
 
 ### Random Forest 
+Random forest regression was estimated using the standard number (100) of decision tree estimators. Two types of features were added in to increase the precision of the estimate:
+1. Since holidays and seasons affect spending patterns, seasonal dummies were added for winter (December-February), spring (March-May), and summer (June-August). Fall was excluded and is the baseline season.
+2. Persistence of sales is expected for Honda Civics, so for each regression, 0 to 4 lags of Civic Car Sales were added to the data based on what is a better fit with the train data.
+
+
+In the random split (75-25 for train-test) prediction, the best model had one lag of Civic Car Sales. The training and test RMSE were approximately 1532.429 and 3027.195 respectively, indicating overfitting.
+
+
+For the prediction of the last 12 months of the model based on all other data points, the best model had one lag of Civic Car Sales. The training and test RMSE were approximately 1512.490 and 2760.710 respectively, indicating overfitting.
+
+
+<img src="visualization/random_forest/Actual_Predicted_Random_Forest.png" width="600">
+
+
+<img src="visualization/random_forest/Abs_Difference_Random_Forest.png" width="600">
+
+
+Overall, while overfitting took place in both prediction tests, the model was only off by around 1-3 thousand car, which indicates a high level of prediction and accuracy even in comparison to the variation of the sales (standard deviation of approximately 7264.089).
+However, the model is limited by not accounting for the time differences in the features and outcome variable, which could decrease accuracy of predictions over time.
 
 ### Decision Tree
+With the Decision Tree model, we implemented specific features to optimize and improve upon the capabilities of the model to make more accurate predictions. We incorporated these four primary features:
+Seasonality: Seasonal indicators were introduced to help the model learn and understand those specific patterns. This is prevalent in the car industry where sales not only spike during specific seasons, but in the final months of quarters as dealerships face greater pressure to meet performance quotas
+First-Order Lag: We provided the model with the total sales of the previous period to act as a baseline to illustrate where the car market stands in that moment 
+First Difference: This feature captures the momentum of car sales as the model can identity the trajectory and whether the market is currently accelerating or decelerating to aid its predictions
+12-Month Rolling Average: The rolling average establishes a smooth, long-term baseline for the model to ground its predictions. This feature helps mitigate the sudden fluctuations we see in the data.
 
+<img src="visualization/decision tree/DT4 Tree.png" width="600">
+
+The model's performance was evaluated using Mean Squared Error (MSE) and Root Mean Squared Error (RMSE). At the optimal tree depth of 5, the model yielded the following metrics:
+Training Set: MSE = 6,446,715 | RMSE = 2,539
+Testing Set: MSE = 11,763,324 | RMSE = 3,429
+Visual Representations of Data 
+
+<img src="visualization/decision tree/DT4 Plot.png" width="600">
+
+<img src="visualization/decision tree/DT4 Last 12 plot.png" width="600">
+
+Visual inspection of the model's predictions against the actual data reveals two behavioral characteristics:
+“Shadow Effect”: An examination of the test predictions over the final 12-month period reveals an interesting “shadow” effect within the Decision Tree model. During periods of high volatility, the model's predictions often appear inversely aligned with reality regardless of the direction. The visual data demonstrates that while the model is accurately tracking established trends and sustained momentum, it fundamentally struggles to anticipate the sudden market shocks and inflection points that trigger severe fluctuations.
+Step-Function Outputs: Due to the structural nature of decision trees, the predictions are seen as blocky steps rather than smooth continuous curves. Whenever the model's input features remain within a specific set of thresholds, the algorithm repeatedly outputs the exact historical mean of that designated leaf node. This creates stagnant and horizontal prediction lines across consecutive periods until a significant enough quantitative shift in the features forces the data into a different terminal node. This is best illustrated when looking at our 12-month test period where we see multiple instances of the straight horizontal line across the graph
 ## III. Recomendations 
 
 ### Mean Squared Error Table

@@ -12,6 +12,13 @@ df["date"] = pd.to_datetime(df["date"])
 df["month"] = df["date"].dt.month
 
 def get_season(month):
+    """
+    Maps a numerical month to its corresponding season.
+    Parameters:
+    month (int): The month as an integer (1-12).
+    Returns:
+    str: The season corresponding to the month ("winter", "spring", "summer", "fall")
+    """
     if month in [12, 1, 2]:
         return "winter"
     elif month in [3, 4, 5]:
@@ -21,6 +28,15 @@ def get_season(month):
     else:
         return "fall"
 
+def prepare_data(df):
+    """
+   This includes:
+    - Converting dates to datetime objects.
+    - Extracting seasonal categories.
+    - Creating lag features (previous month sales).
+    - Calculating momentum (diff) and trend (12-month moving average) features.
+    - Encoding categorical variables into dummies.
+    """
 df["season"] = df["month"].apply(get_season)
 
 df["civic_diff1"] = df["civic_sales"].shift(1).diff()
@@ -62,26 +78,27 @@ print("Test MSE:", test_mse)
 print("Train RMSE:", np.sqrt(train_mse))
 print("Test RMSE:", np.sqrt(test_mse))
 
-# plot 
-plt.figure(figsize=(12, 6))
+def plot_results():
+    """
+    Generates three plots including the full test/train plot, 
+    the specific test window (last 12 months), and the visual structure of the decision tree.
+    """
+    plt.figure(figsize=(12, 6))
 
-# train actual
+
 plt.plot(date_train, y_train,
          label="Train Actual",
          color="blue")
 
-# test actual
 plt.plot(date_test, y_test,
          label="Test Actual",
          color="black")
 
-# train prediction
 plt.plot(date_train, y_train_pred,
          label="Train Prediction",
          linestyle="--",
          color="orange")
 
-# test prediction
 plt.plot(date_test, y_test_pred,
          label="Test Prediction",
          linestyle="--",
