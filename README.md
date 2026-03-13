@@ -3,36 +3,33 @@ Utililzing key metrics and similar car models we aimed to predict the total numb
 
 ## I. Data
 ### Data Sources
-For our key metrics we utilized the Federal Reserve Bank of St. Louis (FRED) data provided on their website. Links to each specific dataset are provided below: 
-Core CPI: https://fred.stlouisfed.org/series/CPILFESL
-Federal Funds Rate: https://fred.stlouisfed.org/series/FEDFUNDS
-Gas Prices: https://fred.stlouisfed.org/series/GASREGW
-Unemployment Rate: https://fred.stlouisfed.org/series/UNRATE
-CSI: https://fred.stlouisfed.org/series/UMCSENT
-TDSP: https://fred.stlouisfed.org/series/TDSP
+For our key metrics we utilized the Federal Reserve Bank of St. Louis (FRED) data provided on their website. Links to each specific dataset are provided below:   
+Core CPI: https://fred.stlouisfed.org/series/CPILFESL  
+Federal Funds Rate: https://fred.stlouisfed.org/series/FEDFUNDS  
+Gas Prices: https://fred.stlouisfed.org/series/GASREGW  
+Unemployment Rate: https://fred.stlouisfed.org/series/UNRATE  
+CSI: https://fred.stlouisfed.org/series/UMCSENT  
+TDSP: https://fred.stlouisfed.org/series/TDSP  
 
-For our data on the total unit sales in the United States of the Honda Civic, Nissan Sentra, and Toyota Corrola we utilized the GoodCarBadCar Automotive Sales Data website. Links to each specific dataset are provided below:
-Honda Civic: https://www.goodcarbadcar.net/honda-civic-sales-figures/
-Nissan Sentra: https://www.goodcarbadcar.net/nissan-sentra-sales-figures/
-Toyota Corrolla: https://www.goodcarbadcar.net/total-toyota-corolla-sales-figures-usa-canada/
+For our data on the total unit sales in the United States of the Honda Civic, Nissan Sentra, and Toyota Corrola we utilized the GoodCarBadCar Automotive Sales Data website. Links to each specific dataset are provided below:  
+Honda Civic: https://www.goodcarbadcar.net/honda-civic-sales-figures/  
+Nissan Sentra: https://www.goodcarbadcar.net/nissan-sentra-sales-figures/  
+Toyota Corrolla: https://www.goodcarbadcar.net/total-toyota-corolla-sales-figures-usa-canada/  
 
 ### Data Collection
 Our key metric datasets were downloaded directly in CSV format from their respective FRED webpages. Our car sales data was downloaded from GoodCarBadCar in an excel worksheet format. From the excel format, we exported the file as a CSV for consistenty across our datasets. After we had all our data in a CSV format we ran our data cleaning file (data/data_cleaning.py) to create a combined table (data/combined_table.csv) to utilize for our modeling and analysis.
 
-### Limitations of Data 
+### Limitations of Data
 1. The TDSP data was measured at a quarterly frequency which is inconsistent with our car sale data which is measured monthly. To account for this, we generalized the TDSP data monthly through a value assumption of consistent TDSP measures across each month of the quarter. A second factor we had to consider was that the last tracking period of the dataset was July 2025. To avoid implicit bias through months beyond July 2025, we ensured our train data consisted of earlier monthly data only to retain validity of our predictions
 2. The Nissan Sentra model sales data concluded with December 2025 unlinke the data for the Honda Civic and Toyota Corolla which concluded with January 2026. To create consistency among the car sales data, we forward filled the Sentra data to match the Sentra December 2025 data. Similarly to the TDSP limiation, we ensured our train data did not consistent of this specific data point.
-3. We are limited on the total number of observations as the car sales data begins in January 2005. With this limited dataset, it restricts the models capabilities to learn the complex patterns and trends present which can result in the models overfitting to the data. 
+3. Another limitation is the small number of total observations. Monthly car sales begin in January 2005, which gives a moderate but still limited time-series sample, especially once lags and a holdout test set are introduced. This restricts the ability of more flexible models to learn complex patterns and makes overfitting a recurring concern. The issue is especially important because our final test set contains only 12 observations, so model comparisons are informative but should still be interpreted with caution.  
 4. Economic impacts such as the COVID-19 pandemic, the housing crisis, or the chip shortage can cause greater flucuations over specific time frames in the data that is not explained wihtin our key metrics. 
 
-### Potential Extensions of Data 
-1. Investigating the impacts of specific economic events such as the US housing crisis and the Covid-19 Pandemic
-2. Utilizing the key metrics to predict the unit monthly sales across different brands and models 
 
 ### Glossary 
-CPI - The Consumer Price Index
-CSI - Consumer Sentiment Index
-TDSP - Percent Household Debt of Disposable Income
+CPI - The Consumer Price Index  
+CSI - Consumer Sentiment Index  
+TDSP - Percent Household Debt of Disposable Income  
 
 ## II. Model Analysis 
 *explanations, evaluations, limitations*
@@ -77,7 +74,16 @@ Among the models we tested, SARIMAX with a shock dummy produced the best pure fo
 
 For the overall project, we lean more heavily toward LASSO with 1 lag of Civic sales as the most useful benchmark moving forward. LASSO dramatically improved on naive linear regression, remained relatively interpretable, and captured persistence in monthly sales while controlling model complexity through regularization. It gives us a strong balance of prediction, simplicity, and feature selection, which makes it especially attractive for future refinement. There is also clear room to improve it further: adding shock dummies, seasonality controls, and possibly lagged versions of selected explanatory variables could help LASSO close part of the remaining gap with SARIMAX. For that reason, our practical recommendation is to treat SARIMAX + shock dummy as the strongest current forecasting model, while viewing lagged LASSO as the most promising and expandable interpretable model for future development.
 
-## IV. Rerun Instructions
+## IV. Modeling Limitations and Potential Extensions
+Our modeling process has a few important limitations that also point directly to natural extensions. First, due to time constraints, we were not able to fully optimize every model. A broader search over lag structures, hyperparameters, and alternative specifications could improve performance further, especially for models like LASSO and Ridge.
+
+Second, most of our models relied on relatively simple additive relationships. We did not systematically test interaction terms, richer nonlinear transformations, or more detailed seasonal structure, even though these could matter for monthly car sales. Extending the feature set in those directions could help the models capture more realistic sales dynamics.
+
+Third, while we added a lag of Civic sales in LASSO, we did not fully explore lagged explanatory variables, shock indicators, or seasonal dummies across all models. This is especially relevant because SARIMAX appears to have benefited greatly from the inclusion of a shock dummy, suggesting that similar additions could also improve LASSO, linear regression, and other methods.
+
+Finally, our evaluation was based on a relatively limited set of forecast comparisons. Future work could test the best-performing models over longer future periods, apply them to other vehicle models, and examine whether the model rankings remain stable under alternative validation windows. In this sense, the current project should be viewed as a strong starting point, with clear room for refinement and expansion.
+
+## V. Rerun Instructions
 ### Requirements 
 Your code will be executed in a Python environment contatining the Standard Library and the packages specified in requirements.txt. Install them with pip install -r requirements.txt.
 
