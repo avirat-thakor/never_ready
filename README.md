@@ -200,6 +200,7 @@ Running `models/lasso.py` will re-estimate the LASSO forecasting model using the
 Furthermore, the script also performs an additional robustness check that re-fits the lag-1 LASSO after dropping the first 200 observations and keeping only the most recent training window. This produces a second set of train/test MSE results and a second forecast plot `visualization/lasso/lasso_lag1_plot_omitting_earlier_training_data.png`. 
 
 #### Random Forest
+Running `models/random_forest.py` will re-estimate the random forest forecasting model using the cleaned `data/combined_table.csv` dataset. The script creates seasonality dummies, performs a search for the ideal number of lags for Honda Civic Sales, and uses the RandomForestRegressor function to produce the model and predictions (set to random seed 42) for both the random split and future prediction tests. It then reports the key metrics and features for the best model. After identifying the preferred lag specification, the script also generates `visualization/random_forest/Actual_Predicted_Random_Forest.png` and `visualization/random_forest/Abs_Difference_Random_Forest.png` to present the overall fit for the future predictions visually.
 
 #### Decision Tree
 
