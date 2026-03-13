@@ -1,4 +1,4 @@
-# Predicitng The Total Number of Honda Civic Sales in the United States
+# Predicting The Total Number of Honda Civic Sales in the United States
 Utililzing key metrics and similar car models we aimed to predict the total number of Honda Civics sold in the United States. Our key metrics included the Core CPI, federal funds rate, gas price, unemployment rate, CSI, and the TDSP. While we used the Nisssan Sentra and Toyota Corrola as our comparable car models.
 
 ## I. Data
@@ -192,6 +192,9 @@ The data is uploaded within this repo in the raw_data folder (data/raw_data). Th
 
 ### Modeling and Visualization 
 #### Linear Regression  
+Running `models/Linear_Regression.py` will be the only file necessary for this section. Doing so will re-estimate the linear regression model using the cleaned dataset in `data/combined_table.csv`. This model uses all but the last 12 datapoints (in 2025) to generate the estimate. The script utilizes standard OLS theory to generate an estimate that minimizes the sum of squared residuals between the model and the observations in the combined dataset. 
+The model will first print an OLS Regression Results table using the model mentioned in the previous section on the linear regression. Then, it will print the Train MSE, the Test MSE, the Root Train MSE, the Root Test MSE, and the R-squared, which helps set a baseline expectation for how well the model performs. 
+The model will then generate 2 files in `visualization/linear_regression/`. The first file, called `linear_regression_full_plot.png`, shows how well the model fits the data over the entire dataset, including the ones recorded in 2025. The second file, `linear_regression_plot.png`, shows how well the model can predict the last 12 months of the dataset given the remaining observations. 
 
 #### Lasso  
 Running `models/lasso.py` will re-estimate the LASSO forecasting model using the cleaned `data/combined_table.csv` dataset. The script standardizes the predictors, performs a grid search over lag specifications for Civic sales, and uses LassoCV with TimeSeriesSplit to choose the optimal regularization parameter for each lag setting. It then reports the key metrics and features for each candidate model. After identifying the preferred lag specification, the script also generates `visualization/lasso/lasso_lag1_plot.png` to present the overall fit visually.  
