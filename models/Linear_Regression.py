@@ -1,6 +1,7 @@
 import pandas as pd
 import statsmodels.formula.api as smf
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import os
 
 from sklearn.linear_model import LinearRegression
@@ -9,6 +10,7 @@ from sklearn.metrics import mean_squared_error as mse
 
 
 df = pd.read_csv('data/combined_table.csv')
+df['date'] = pd.to_datetime(df['date'])
 
 output_dir = "visualization/linear_regression"
 if not os.path.exists(output_dir):
@@ -85,10 +87,16 @@ plt.close()
 plt.figure(figsize=(10, 6))
 plt.plot(df['date'], y, label='Actual', color='blue')
 plt.plot(df['date'], model.predict(X), label='Predicted', color='red', linestyle='--')
+
 plt.xlabel('Date')
 plt.ylabel('Civic Sales')
 plt.title('Linear Regression: Actual vs Predicted (Full Dataset)')
 plt.legend()
+
+ax = plt.gca()
+ax.xaxis.set_major_locator(mdates.YearLocator())
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+
 plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig(f"{output_dir}/linear_regression_full_plot.png", dpi=300, bbox_inches="tight")
