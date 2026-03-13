@@ -85,14 +85,22 @@ Finally, our evaluation was based on a relatively limited set of forecast compar
 
 ## V. Rerun Instructions
 ### Requirements 
-Your code will be executed in a Python environment contatining the Standard Library and the packages specified in requirements.txt. Install them with pip install -r requirements.txt.
+Your code will be executed in a Python environment contatining the Standard Library and the packages specified in `requirements.txt`. Install them with pip install -r requirements.txt.
 
 
 ### Data Collection and Cleaning
-The data is uploaded within this repo in the raw_data folder (data/raw_data). The original files themselves can be retrived from the links provided with the Data Sources section of this readme. To clean the data, use our 'data_cleaning.py' which can be found in our data folder. Running the cleaning file will produce 'combined_table.csv' that combines all our datasets and provides clean data ready for modeling and analysis
+The data is uploaded within this repo in the raw_data folder (data/raw_data). The original files themselves can be retrived from the links provided with the Data Sources section of this readme. To clean the data, run our `data/data_cleaning.py` which can be found in our data folder. Running the cleaning file will produce `data/combined_table.csv` that combines all our datasets and provides clean data ready for modeling and analysis
 
-### Modeling 
+### Modeling and Visualization 
+#### Linear Regression  
 
+#### Lasso  
+Running `models/lasso.py` will re-estimate the LASSO forecasting model using the cleaned `data/combined_table.csv` dataset. The script standardizes the predictors, performs a grid search over lag specifications for Civic sales, and uses LassoCV with TimeSeriesSplit to choose the optimal regularization parameter for each lag setting. It then reports the key metrics and features for each candidate model. After identifying the preferred lag specification, the script also generates `visualization/lasso/lasso_lag1_plot.png` to present the overall fit visually.  
+Further more, the script also performs an additional robustness check that re-fits the lag-1 LASSO after dropping the first 200 observations and keeping only the most recent training window. This produces a second set of train/test MSE results and a second forecast plot `visualization/lasso/lasso_lag1_plot_omitting_earlier_training_data.png`. 
+
+#### Random Forest
+
+#### Decision Tree
 
 
 
