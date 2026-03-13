@@ -125,6 +125,12 @@ In the random split (75-25 for train-test) prediction, the best model had one la
 For the prediction of the last 12 months of the model based on all other data points, the best model had one lag of Civic Car Sales. The training and test RMSE were approximately 1512.490 and 2760.710 respectively, indicating overfitting.
 
 
+<img src="visualization/random_forest/Actual_Predicted_Random_Forest.png" width="600">
+
+
+<img src="visualization/random_forest/Abs_Difference_Random_Forest.png" width="600">
+
+
 Overall, while overfitting took place in both prediction tests, the model was only off by around 1-3 thousand car, which indicates a high level of prediction and accuracy even in comparison to the variation of the sales (standard deviation of approximately 7264.089).
 However, the model is limited by not accounting for the time differences in the features and outcome variable, which could decrease accuracy of predictions over time.
 
