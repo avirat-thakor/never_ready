@@ -129,7 +129,26 @@ Overall, while overfitting took place in both prediction tests, the model was on
 However, the model is limited by not accounting for the time differences in the features and outcome variable, which could decrease accuracy of predictions over time.
 
 ### Decision Tree
+With the Decision Tree model, we implemented specific features to optimize and improve upon the capabilities of the model to make more accurate predictions. We incorporated these four primary features:
+Seasonality: Seasonal indicators were introduced to help the model learn and understand those specific patterns. This is prevalent in the car industry where sales not only spike during specific seasons, but in the final months of quarters as dealerships face greater pressure to meet performance quotas
+First-Order Lag: We provided the model with the total sales of the previous period to act as a baseline to illustrate where the car market stands in that moment 
+First Difference: This feature captures the momentum of car sales as the model can identity the trajectory and whether the market is currently accelerating or decelerating to aid its predictions
+12-Month Rolling Average: The rolling average establishes a smooth, long-term baseline for the model to ground its predictions. This feature helps mitigate the sudden fluctuations we see in the data.
 
+<img src="visualization/decision tree/DT4 Tree.png" width="600">
+
+The model's performance was evaluated using Mean Squared Error (MSE) and Root Mean Squared Error (RMSE). At the optimal tree depth of 5, the model yielded the following metrics:
+Training Set: MSE = 6,446,715 | RMSE = 2,539
+Testing Set: MSE = 11,763,324 | RMSE = 3,429
+Visual Representations of Data 
+
+<img src="visualization/decision tree/DT4 Plot.png" width="600">
+
+<img src="visualization/decision tree/DT4 Last 12 plot.png" width="600">
+
+Visual inspection of the model's predictions against the actual data reveals two behavioral characteristics:
+“Shadow Effect”: An examination of the test predictions over the final 12-month period reveals an interesting “shadow” effect within the Decision Tree model. During periods of high volatility, the model's predictions often appear inversely aligned with reality regardless of the direction. The visual data demonstrates that while the model is accurately tracking established trends and sustained momentum, it fundamentally struggles to anticipate the sudden market shocks and inflection points that trigger severe fluctuations.
+Step-Function Outputs: Due to the structural nature of decision trees, the predictions are seen as blocky steps rather than smooth continuous curves. Whenever the model's input features remain within a specific set of thresholds, the algorithm repeatedly outputs the exact historical mean of that designated leaf node. This creates stagnant and horizontal prediction lines across consecutive periods until a significant enough quantitative shift in the features forces the data into a different terminal node. This is best illustrated when looking at our 12-month test period where we see multiple instances of the straight horizontal line across the graph
 ## III. Recomendations 
 
 ### Mean Squared Error Table
