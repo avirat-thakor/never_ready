@@ -1,4 +1,4 @@
-# Predicitng The Total Number of Honda Civic Sales in the United States
+# Predicting The Total Number of Honda Civic Sales in the United States
 Utililzing key metrics and similar car models we aimed to predict the total number of Honda Civics sold in the United States. Our key metrics included the Core CPI, federal funds rate, gas price, unemployment rate, CSI, and the TDSP. While we used the Nisssan Sentra and Toyota Corrola as our comparable car models.
 
 ## I. Data
@@ -107,7 +107,7 @@ This model presented a test MSE of approx. 30,119,255 and a train MSE of aprrox.
 
 Seeking to imrpove on this model, by accounting for unusually large disruptions in the automobile market (e.g. the COVID-19 pandemic and global supply chain issues) we introduced a shock dummy variable that manually identifies periods of abnormal fluctuations in sales. This allows the model to separate temporary shocks from the underlying time-series dynamics rather than forcing the autoregressive structure to absorb those extreme movements. This model presented a test MSE of approx. 29,392,150 and a train MSE of aprrox. 2,936,170; which outperforms all of our other models in test MSE (see SARIMAX + Shock Dummy prediction plot below).
 
-<img src="visualization/sarimax/visualization/sarimax/Civic_Sales_SARIMAX__Shocks_Forecast.png" width="600">
+<img src="visualization/sarimax/visualization/sarimax/Civic_Sales_SARIMAX_Shocks_Forecast.png" width="600">
 
 The SARIMAX model with the shock dummy produced the strongest forecasting performance among the models considered, achieving the lowest test MSE of approx. 2,936,170 in our comparison. Notably, the model’s training MSE is relatively large due to the volatility present in the earlier portion of the dataset. This also may be either due to the nature of the model (coefficient estimation through Maximum Likelihood rather than minimizing the errors) or inherent limitations in SARIMA type models to handle heteroskedasticity caused by the shocks. That said, it follows that explicitly modeling seasonality and major disruptions in vehicle markets significantly improved forecast accuracy for monthly car sales.
 
@@ -191,15 +191,23 @@ The data is uploaded within this repo in the raw_data folder (data/raw_data). Th
 
 ### Modeling and Visualization 
 #### Linear Regression  
+Running `models/Linear_Regression.py` will be the only file necessary for this section. Doing so will re-estimate the linear regression model using the cleaned dataset in `data/combined_table.csv`. This model uses all but the last 12 datapoints (in 2025) to generate the estimate. The script utilizes standard OLS theory to generate an estimate that minimizes the sum of squared residuals between the model and the observations in the combined dataset. 
+The model will first print an OLS Regression Results table using the model mentioned in the previous section on the linear regression. Then, it will print the Train MSE, the Test MSE, the Root Train MSE, the Root Test MSE, and the R-squared, which helps set a baseline expectation for how well the model performs. 
+The model will then generate 2 files in `visualization/linear_regression/`. The first file, called `linear_regression_full_plot.png`, shows how well the model fits the data over the entire dataset, including the ones recorded in 2025. The second file, `linear_regression_plot.png`, shows how well the model can predict the last 12 months of the dataset given the remaining observations. 
 
 #### Lasso  
 Running `models/lasso.py` will re-estimate the LASSO forecasting model using the cleaned `data/combined_table.csv` dataset. The script standardizes the predictors, performs a grid search over lag specifications for Civic sales, and uses LassoCV with TimeSeriesSplit to choose the optimal regularization parameter for each lag setting. It then reports the key metrics and features for each candidate model. After identifying the preferred lag specification, the script also generates `visualization/lasso/lasso_lag1_plot.png` to present the overall fit visually.  
 Furthermore, the script also performs an additional robustness check that re-fits the lag-1 LASSO after dropping the first 200 observations and keeping only the most recent training window. This produces a second set of train/test MSE results and a second forecast plot `visualization/lasso/lasso_lag1_plot_omitting_earlier_training_data.png`. 
 
 #### Random Forest
+Running `models/random_forest.py` will re-estimate the random forest forecasting model using the cleaned `data/combined_table.csv` dataset. The script creates seasonality dummies, performs a search for the ideal number of lags for Honda Civic Sales, and uses the RandomForestRegressor function to produce the model and predictions (set to random seed 42) for both the random split and future prediction tests. It then reports the key metrics and features for the best model. After identifying the preferred lag specification, the script also generates `visualization/random_forest/Actual_Predicted_Random_Forest.png` and `visualization/random_forest/Abs_Difference_Random_Forest.png` to present the overall fit for the future predictions visually.
 
 #### Decision Tree
 Run the the file `models/decision_tree.py` to recreate the Decision Tree forcasting model. This script will utilize our cleaned dataset `data/combined_table.csv` to ensure all the features and specifications run smoothly. In this script, componets of seasonality, lags, first differences, and rolling averages will be utilized at a depth of 5 for greater optimization. The factors After printing the numerical figures for the MSE's and RMSE's of the test and train, three visuals will be generated: these will include the decsion tree `visualization/decision tree/DT4 Tree.png`, the full plot of the test and train `visualization/decision tree/DT4 Plot.png`, and a plot exclusively showing the predictions for the last 12 months of that data `visualization/decision tree/DT4 Last 12 plot.png`.
+
+#### SARIMAX
+Running `models/sarimax.py` will re-estimate the sarimax and sarimax + shock dummy forecasting models using the cleaned `data/combined_table.csv` dataset. The script check for stationarity, runs sarimax models for Civic sales with exog. features, and uses statsmodels' tsa.statespace.sarimax and graphics.tsaplots for time series analysis and visualization. It then reports the key metrics and features for each candidate model. After differencing for stationarity, the script also generates pacf and acf plots to `visualization/sarimax/pacf_diff.png` and `visualization/sarimax/acf_diff.png` to evaluate for the optimal ARIMAX structure.  
+Furthermore, the script also generates the plots for prediction for SARIMAX and SARIMAX + Shock Dummy as `visualization/sarimax/Civic_Sales_SARIMAX_Forecast.png` and `visualization/sarimax/Civic_Sales_SARIMAX_Shocks_Forecast.png`. 
 
 
 
