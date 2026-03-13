@@ -3,7 +3,7 @@ from sklearn.metrics import mean_squared_error
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LassoCV
+# from sklearn.linear_model import LassoCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
@@ -30,8 +30,10 @@ print("ADF Stat: %f" % result2[0])
 print("p-value: %f" % result2[1])
 
 plot_acf(df_diff, lags=36)
+plt.savefig("visualization/sarimax/acf_diff.png")
+
 plot_pacf(df_diff, lags=36)
-plt.show()
+plt.savefig("visualization/sarimax/pacf_diff.png")
 
 train = df.iloc[:-12]
 test = df.iloc[-12:]
@@ -93,6 +95,7 @@ print(f"SARIMAX Test MSE: {test_mse_exog:.2f}")
 print(f"SARIMAX Train RMSE: {train_rmse_exog:.2f}")
 print(f"SARIMAX Test RMSE: {test_rmse_exog:.2f}")
 
+'''
 # SARIMAX + LASSO
 lasso_var = ["gas", "unemploy", "fedfunds", "cpi", "csi", "tdsp", 
              "corolla_sales", "sentra_sales"]
@@ -138,6 +141,7 @@ test_mse_lasso = mean_squared_error(y_test, y_test_pred_lasso)
 print("LASSO selected:", selected_var)
 print(f"SARIMAX + LASSO Train MSE: {train_mse_lasso:.2f}")
 print(f"SARIMAX + LASSO Test MSE: {test_mse_lasso:.2f}")
+'''
 
 # SARIMAX + Shock Dummy
 df["shock_dummy"] = 0

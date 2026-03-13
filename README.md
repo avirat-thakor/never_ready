@@ -87,7 +87,31 @@ Once we restricted the model to recent training data, the more typical pattern o
 
 Overall, LASSO with 1 lag of Civic sales is a strong and interpretable forecasting model. It improved substantially over naive linear regression, captured persistence in monthly sales, and delivered strong out-of-sample performance while remaining relatively simple through regularization. Although SARIMAX with a shock dummy (See next section) achieved the best final forecasting accuracy in the end, LASSO remained our preferred interpretable machine-learning benchmark.
 
-### Time Series (ARIMA)
+### Time Series (ARIMAX + Shock Dummy)
+Because monthly vehicle sales exhibit strong persistence and seasonal patterns, we estimated a set of time-series models using the SARIMA and SARIMAX frameworks. Unlike regression-based models, these approaches explicitly model the temporal dependence of the sales series and allow seasonal patterns to be captured directly.
+
+Before estimating the models, we tested the Honda Civic sales series for stationarity using the Augmented Dickey–Fuller (ADF) test. The original series failed to reject the null hypothesis of a unit root, indicating that the series was non-stationary. After applying a first difference, the ADF test strongly rejected the null, confirming that the differenced sales data was stationary and could be used for time-series modeling.
+
+To determine the correct lag structure, we examined the autocorrelation function (ACF) and partial autocorrelation function (PACF) plots of the differenced series. The ACF displayed a significant spike at lag 1 as well as a seasonal spike at lag 12, while the PACF did not show a clear cutoff pattern associated with an autoregressive process. This pattern is consistent with a moving-average process with a seasonal component (see ACF and PACF plots). 
+
+<img src="visualization/sarimax/acf_diff.png" width="600">
+
+<img src="visualization/sarimax/pacf_diff.png" width="600">
+
+Based on these diagnostics, we estimated a SARIMA(0,1,1)(0,1,1)_12 model, where the seasonal component captures yearly patterns in monthly vehicle sales.
+
+While the SARIMA model captures the internal dynamics of Civic sales, it does not incorporate economic variables that may influence vehicle sales (demand). To address this, we extended the model to a SARIMAX specification by including selected macroeconomic indicators as exogenous variables, including gas prices, the unemployment rate, and the federal funds rate.
+This model presented a test MSE of approx. 30,119,255 and a train MSE of aprrox. 3,185,347; which outperforms a few of our other ML models (see SARIMAX prediction plot below).
+
+<img src="visualization/sarimax/Civic_Sales_SARIMAX_Forecast.png" width="600">
+
+Seeking to imrpove on this model, by accounting for unusually large disruptions in the automobile market (e.g. the COVID-19 pandemic and global supply chain issues) we introduced a shock dummy variable that manually identifies periods of abnormal fluctuations in sales. This allows the model to separate temporary shocks from the underlying time-series dynamics rather than forcing the autoregressive structure to absorb those extreme movements. This model presented a test MSE of approx. 29,392,150 and a train MSE of aprrox. 2,936,170; which outperforms all of our other models in test MSE (see SARIMAX + Shock Dummy prediction plot below).
+
+<img src="visualization/sarimax/visualization/sarimax/Civic_Sales_SARIMAX__Shocks_Forecast.png" width="600">
+
+The SARIMAX model with the shock dummy produced the strongest forecasting performance among the models considered, achieving the lowest test MSE of approx. 2,936,170 in our comparison. Notably, the model’s training MSE is relatively large due to the volatility present in the earlier portion of the dataset. This also may be either due to the nature of the model (coefficient estimation through Maximum Likelihood rather than minimizing the errors) or inherent limitations in SARIMA type models to handle heteroskedasticity caused by the shocks. That said, it follows that explicitly modeling seasonality and major disruptions in vehicle markets significantly improved forecast accuracy for monthly car sales.
+
+Notable models that were also explored include, SARIMAX with all features available and SARIMAX + LASSO for feature selection. Neither model outperformed the SARIMAX + Shock Dummy variable in either train or test MSE.
 
 ### Random Forest 
 
