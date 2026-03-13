@@ -17,7 +17,7 @@ def get_season(month):
     Parameters:
     month (int): The month as an integer (1-12).
     Returns:
-    str: The season corresponding to the month ("winter", "spring", "summer", "fall").
+    str: The season corresponding to the month ("winter", "spring", "summer", "fall")
     """
     if month in [12, 1, 2]:
         return "winter"
