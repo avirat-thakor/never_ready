@@ -37,6 +37,61 @@ TDSP - Percent Household Debt of Disposable Income
 ## II. Model Analysis 
 *explanations, evaluations, limitations*
 ### Linear Regression
+The linear regression acted as our baseline model. No adjustemnts to weights, addition of dummy variables, or any other modifications were added to improve performance. The model took the following form, with all variables being included in the regression:
+
+Civic_sales = 𝛼 + β1(corrola_sales) + β2(sentra_sales) + β3(cpi) + β4(fedfunds) + β5(gas) + β6(unemploy) + β7(csi) + β8(tdsp) + ε
+
+                            OLS Regression Results
+==============================================================================
+Dep. Variable:            civic_sales   R-squared:                       0.674
+Model:                            OLS   Adj. R-squared:                  0.663
+Method:                 Least Squares   F-statistic:                     62.95
+Date:                Thu, 12 Mar 2026   Prob (F-statistic):           4.65e-55
+Time:                        18:09:18   Log-Likelihood:                -2466.7
+No. Observations:                 253   AIC:                             4951.
+Df Residuals:                     244   BIC:                             4983.
+Df Model:                           8
+Covariance Type:            nonrobust
+=================================================================================
+                    coef    std err          t      P>|t|      [0.025      0.975]
+---------------------------------------------------------------------------------
+Intercept     -7734.6151   1.51e+04     -0.513      0.608   -3.74e+04     2.2e+04
+corolla_sales     0.5632      0.058      9.778      0.000       0.450       0.677
+sentra_sales      0.5596      0.091      6.174      0.000       0.381       0.738
+cpi             -10.4592     25.408     -0.412      0.681     -60.506      39.588
+fedfunds        132.1791    255.344      0.518      0.605    -370.782     635.140
+gas             926.2244    599.044      1.546      0.123    -253.732    2106.181
+unemploy        663.1569    214.578      3.091      0.002     240.496    1085.818
+csi              86.7959     42.872      2.025      0.044       2.349     171.243
+tdsp             42.4914    437.657      0.097      0.923    -819.577     904.560
+==============================================================================
+Omnibus:                       28.341   Durbin-Watson:                   0.984
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               45.150
+Skew:                           0.666   Prob(JB):                     1.57e-10
+Kurtosis:                       4.584   Cond. No.                     1.61e+06
+==============================================================================
+
+The regression itself suffers from multiple issues, all of which likely impact the model's predictive capabilities. The model suffers from both autocorrelation (because we regressed trends) and multicollinearity. This makes it hard to interpret the regression table above or draw conclusions from many of the coefficients.
+
+In terms of predictive capabilities, the model produces the following results:
+Train MSE: 17646666.70
+Test MSE: 10291781.38
+Root Train MSE: 4200.79
+Root Test MSE: 3208.08
+R-squared: 0.67
+
+The first plot shows the overall fit of the linear regression model on the dataset. 
+
+<img src="visualization/linear_regression/linear_regression_full_plot.png" width="600">
+
+While the model does appear to fit the actual data decently well. During periods of shocks, however, the model fails and often desyncs from the data. This creates points of extreme differences, and as such, hurts the model's prediction abilities as these points of failure compound. 
+This becomes far more evident when we zoom into the model's prediction for 2025 sales, as can be seen below:
+
+<img src="visualization/linear_regression/linear_regression_plot.png" width="600">
+
+Visually, the model is far more disjointed than in the overall dataset, especially from March 2025 to October 2025. This is likely a result of the model failing to account for seasonal changes in sales, and as such, the model becomes significantly less accurate. 
+
+Overall, the linear regression acts as a good standard for assessing the performance of the other models, however, it loses its predictive strength in the face of shocks or extreme peaks in sales figures. While adjustments such as adjusting for seasonality may improve its performance, those are out of the scope of this project. 
 
 ### LASSO
 
