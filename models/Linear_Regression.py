@@ -3,8 +3,6 @@ import statsmodels.formula.api as smf
 import matplotlib.pyplot as plt
 import os
 
-from model_results import log_model_results
-
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error as mse
@@ -53,7 +51,6 @@ print(f'Root Test MSE: {root_test}')
 print(f'R-squared: {R_Squared}')
 
 
-###
 """
 Note: The model by default produced some interesting results that will need attending to.
 - The R-squared was roughly 0.674, which was surprisingly high given we didn't think it would
@@ -64,15 +61,7 @@ our assumtion that they were substitutes for civic sales.
 the regression includes a note highlighting strong multicollinearity. 
 - Will need further developing.
 """
-### Logging model results
-model_name = "linear_regression"
-metrics = {
-    "train_mse": train_mse,
-    "test_mse": test_mse,
-    "root_train_mse": root_train,
-    "root_test_mse": root_test,
-}
-log_model_results(model_name, metrics)
+
 
 ### Plotting the actual vs predicted values for the test set, 
 ### using the 12 omitted data points as the test set.
