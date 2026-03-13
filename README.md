@@ -95,6 +95,18 @@ Overall, LASSO with 1 lag of Civic sales is a strong and interpretable forecasti
 
 ## III. Recomendations 
 
+### Mean Squared Error Table
+
+Our models produced the following Train MSEs, Test MSEs, Train RMSEs, and Test RMSEs:
+
+| Model | Train MSE | Test MSE | Train RMSE | Test RMSE|
+| --- | --- | --- | --- | --- |
+| Linear Regression | 17,646,666.70 | 10,291,781.38 | 4,200.79 | 3,208.08 |
+| L.A.S.S.O. | 14,481,457.06 | 3,976,307.62 | 3,805.45 | 1,994.07 |
+| Decision Tree | 6,446,715.16 | 11,763,324.31 | 2,539.04 | 3,429.77 |
+| Random Forest | 2,287,625.71 | 7,621,517.15 | 1,512.49 | 2,760.71 |
+| SARIMAX + Shock Dummy | 29,392,150.73 | 2,936,170.34 | 5,421.37 | 1,713.75 |
+
 Among the models we tested, SARIMAX with a shock dummy produced the best pure forecasting performance, achieving the lowest test MSE and RMSE in our . This suggests that explicitly modeling time-series dynamics and accounting for abnormal periods such as COVID can materially improve predictive accuracy. At the same time, we do not view this result as meaning that SARIMAX is the only path forward. A significantly contributing reason for its strong performance is that it benefited substantially from the inclusion of a shock dummy, and that same idea could also be incorporated into other models, including LASSO, linear regression, and tree-based methods. In that sense, part of SARIMAX’s advantage likely reflects the value of better feature design, not just the model class itself.
 
 For the overall project, we lean more heavily toward LASSO with 1 lag of Civic sales as the most useful benchmark moving forward. LASSO dramatically improved on naive linear regression, remained relatively interpretable, and captured persistence in monthly sales while controlling model complexity through regularization. It gives us a strong balance of prediction, simplicity, and feature selection, which makes it especially attractive for future refinement. There is also clear room to improve it further: adding shock dummies, seasonality controls, and possibly lagged versions of selected explanatory variables could help LASSO close part of the remaining gap with SARIMAX. For that reason, our practical recommendation is to treat SARIMAX + shock dummy as the strongest current forecasting model, while viewing lagged LASSO as the most promising and expandable interpretable model for future development.
